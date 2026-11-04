@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sokak Futbolu Efsanesi - Ayberk Studio</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #064e3b;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #065f46;
+            border: 3px solid #10b981;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+        h1 {
+            text-align: center;
+            color: #facc15;
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #a7f3d0;
+            margin-bottom: 20px;
+        }
+        .scoreboard {
+            background-color: #022c22;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 2px solid #34d399;
+        }
+        .team-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #064e3b;
+            padding: 5px 15px;
+            border-radius: 8px;
+        }
+        .match-text {
+            background-color: #022c22;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 17px;
+            line-height: 1.6;
+            min-height: 160px;
+            margin-bottom: 20px;
+            white-space: pre-line;
+            border: 1px solid #059669;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            margin: 6px 0;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-green { background-color: #10b981; color: #022c22; }
+        .btn-yellow { background-color: #f59e0b; color: #022c22; }
+        .btn-blue { background-color: #38bdf8; color: #022c22; }
+        .btn-red { background-color: #ef4444; color: white; }
+        .btn:hover { opacity: 0.9; transform: scale(1.01); }
+        .hidden { display: none; }
+        .highlight { color: #facc15; font-weight: bold; }
+        .gol { color: #4ade80; font-weight: bold; font-size: 20px; }
+        .kacirma { color: #f87171; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚽ SOKAK FUTBOLU EFSANESİ</h1>
+    <p class="subtitle">Ayberk Studio & Ekibi</p>
+
+    <!-- SKOR TABLOSU -->
+    <div class="scoreboard">
+        <div class="team-name">🏫 OKUL TAKIMI</div>
+        <div class="score"><span id="score-us">0</span> - <span id="score-them">0</span></div>
+        <div class="team-name">⚡ MAHALLE RAKİBİ</div>
+    </div>
+
+    <!-- ANA MENÜ PANELİ -->
+    <div id="menu-panel">
+        <div class="match-text">
+            <b>KADRONUZ:</b><br>
+            🧤 <b>Kaleci:</b> Akif (Geçilmez Kale)<br>
+            🛡️ <b>Defans:</b> Yavuz (Sert Müdahale)<br>
+            🧠 <b>Oyun Kurucu:</b> Mehmet (Adrese Teslim Pas)<br>
+            ⚡ <b>Kanat:</b> Yiğit (Hızlı Çalım)<br>
+            ⚽ <b>Forvet:</b> Ayberk (Bitirici Şut)<br><br>
+            Okul bahçesinde dev maç başlıyor! Takımını zafere taşımaya hazır mısın?
+        </div>
+        <button class="btn btn-green" onclick="maci_baslat()">🚀 Maçı Başlat!</button>
+    </div>
+
+    <!-- OYUN PANELİ -->
+    <div id="game-panel" class="hidden">
+        <div id="match-log" class="match-text"></div>
+
+        <div id="options-panel">
+            <button id="btn-a" class="btn btn-yellow"></button>
+            <button id="btn-b" class="btn btn-blue"></button>
+            <button id="btn-c" class="btn btn-green"></button>
+        </div>
+
+        <button id="btn-restart" class="btn btn-red hidden" onclick="menuye_don()">🏠 Ana Menüye Dön</button>
+    </div>
+</div>
+
+<script>
+    let scoreUs = 0;
+    let scoreThem = 0;
+    let currentPos = 0;
+
+    function maci_baslat() {
+        scoreUs = 0;
+        scoreThem = 0;
+        currentPos = 1;
+        updateScore();
+        document.getElementById('menu-panel').classList.add('hidden');
+        document.getElementById('game-panel').classList.remove('hidden');
+        document.getElementById('btn-restart').classList.add('hidden');
+        pos_1();
+    }
+
+    function updateScore() {
+        document.getElementById('score-us').innerText = scoreUs;
+        document.getElementById('score-them').innerText = scoreThem;
+    }
+
+    function setupButtons(textA, actA, textB, actB, textC, actC) {
+        let bA = document.getElementById('btn-a');
+        let bB = document.getElementById('btn-b');
+        let bC = document.getElementById('btn-c');
+        
+        bA.innerText = textA; bA.onclick = actA;
+        bB.innerText = textB; bB.onclick = actB;
+        if(textC) {
+            bC.innerText = textC; bC.onclick = actC;
+            bC.classList.remove('hidden');
+        } else {
+            bC.classList.add('hidden');
+        }
+        document.getElementById('options-panel').classList.remove('hidden');
+    }
+
+    // 1. POZİSYON: Maç Başlangıcı ve Defans
+    function pos_1() {
+        document.getElementById('match-log').innerHTML = "⏱️ <b>10. DAKİKA:</b> Maç başladı! Rakip takım tehlikeli geldi, forvetleri ceza sahasına sokuluyor.<br><br>Defansta <b>Yavuz</b> rakiple karşı karşıya! Yavuz ne yapmalı?";
+        setupButtons("A) Sert Kayarak Müdahale Et", () => pos_1_res('A'),
+                     "B) Ayakta Kalıp Açısını Kapat", () => pos_1_res('B'));
+    }
+
+    function pos_1_res(choice) {
+        let log = document.getElementById('match-log');
+        if (choice === 'A') {
+            log.innerHTML = "🚫 <b>Yavuz</b> sert kaydı ama hakem faul çaldı! Rakip serbest vuruş kullandı ve top 90'a gitti.<br><br><span class='kacirma'>GOL! Rakip 1-0 öne geçti.</span>";
+            scoreThem++;
+        } else {
+            log.innerHTML = "🛡️ <b>Yavuz</b> harika ayakta kaldı, topu söküp aldı ve hemen ileriye aktardı!<br><br><span class='highlight'>Tehlike uzaklaştırıldı!</span>";
+        }
+        updateScore();
+        setupButtons("Devam Et ⏩", pos_2);
+    }
+
+    // 2. POZİSYON: Orta Saha ve Oyun Kurma
+    function pos_2() {
+        document.getElementById('match-log').innerHTML = "⏱️ <b>35. DAKİKA:</b> Top orta sahada <b>Mehmet</b>'in ayaklarında. Mehmet sahayı mükemmel süzüyor.<br><br>Mehmet nasıl bir pas atmalı?";
+        setupButtons("A) Sağ Kanatta Hızlanan Yiğit'e Ara Pası", () => pos_2_res('A'),
+                     "B) Doğrudan Kaleye Uzaktan Şut Vur", () => pos_2_res('B'));
+    }
+
+    function pos_2_res(choice) {
+        let log = document.getElementById('match-log');
+        if (choice === 'A') {
+            log.innerHTML = "⚡ <b>Mehmet</b> adrese teslim bir ara pası çıkardı! <b>Yiğit</b> hızla çizgiye indi ve rakiplerini oyundan düşürdü!";
+            setupButtons("Hücuma Devam Et 🔥", pos_3);
+        } else {
+            log.innerHTML = "💥 Mehmet uzaktan şansını denedi ama top farkla üstten dışarı gitti.";
+            setupButtons("Devam Et ⏩", pos_3);
+        }
+    }
+
+    // 3. POZİSYON: Gol Fırsatı ve Ayberk
+    function pos_3() {
+        document.getElementById('match-log').innerHTML = "⏱️ <b>60. DAKİKA:</b> Yiğit ceza sahasına ortaladı! Top al da at dercesine <b>Ayberk</b>'in önüne geldi.<br><br>Ayberk vuruşunu nasıl yapacak?";
+        setupButtons("A) Plase İle Köşeye Bırak", () => pos_3_res('A'),
+                     "B) Gelişine Sert Vole Vur", () => pos_3_res('B'));
+    }
+
+    function pos_3_res(choice) {
+        let log = document.getElementById('match-log');
+        if (choice === 'A') {
+            scoreUs++;
+            log.innerHTML = "⚽ <b>GÖÖÖÖLLLL!</b> Ayberk harika bir plaseyle topu tam 90'a astı!<br><br><span class='gol'>MÜKEMMEL GOL!</span>";
+        } else {
+            log.innerHTML = "❌ Ayberk gelişine sert vurdu ama top direğe çarpıp auta çıktı!";
+        }
+        updateScore();
+        setupButtons("Son Dakikalar ⏳", pos_4);
+    }
+
+    // 4. POZİSYON: Kaleci Akif ve Penaltı / Son An
+    function pos_4() {
+        document.getElementById('match-log').innerHTML = "⏱️ <b>89. DAKİKA:</b> Son dakikalar! Rakip takım son bir umutla yüklendi ve ceza sahasında çaprazdan şut çıkardı!<br><br>Kalede <b>Akif</b> uzanıyor!";
+        setupButtons("A) Köşeye Uzanıp Parmak Ucuyla Çıkar", () => pos_4_res('A'),
+                     "B) Ayaklarıyla Çıkarmaya Çalış", () => pos_4_res('B'));
+    }
+
+    function pos_4_res(choice) {
+        let log = document.getElementById('match-log');
+        if (choice === 'A') {
+            log.innerHTML = "🧤 <b>AKİF! AKİF! AKİF!</b> İnanılmaz bir kurtarış! Kalede devleşti ve topu kornere tokatladı!";
+        } else {
+            scoreThem++;
+            log.innerHTML = "😔 Top Akif'in ayaklarının altından ağlarla buluştu.<br><br><span class='kacirma'>Rakip golü buldu.</span>";
+        }
+        updateScore();
+        setupButtons("Maç Sonucunu Gör 🏆", pos_final);
+    }
+
+    // MAÇ SONUCU
+    function pos_final() {
+        let log = document.getElementById('match-log');
+        document.getElementById('options-panel').classList.add('hidden');
+        document.getElementById('btn-restart').classList.remove('hidden');
+
+        if (scoreUs > scoreThem) {
+            log.innerHTML = `🎉 <b>MAÇ BİTTİ: KAZANDINIZ! (${scoreUs} - ${scoreThem})</b><br><br>Sen, Mehmet, Yavuz, Yiğit ve Akif harika bir oyunla mahalle maçını kazandınız! Okulun efsanesi sizsiniz! 🏆`;
+        } else if (scoreUs === scoreThem) {
+            log.innerHTML = `🤝 <b>MAÇ BİTTİ: BERABERE! (${scoreUs} - ${scoreThem})</b><br><br>Çok başa baş bir mücadele oldu. İki takım da sahadan dostça ayrıldı!`;
+        } else {
+            log.innerHTML = `💔 <b>MAÇ BİTTİ: KAYBETTİNİZ (${scoreUs} - ${scoreThem})</b><br><br>Sağlık olsun! Bir sonraki maçta rovanşı almak için tekrar dene! 💪`;
+        }
+    }
+
+    function menuye_don() {
+        document.getElementById('game-panel').classList.add('hidden');
+        document.getElementById('menu-panel').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
